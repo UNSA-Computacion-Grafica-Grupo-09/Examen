@@ -1,5 +1,7 @@
 import os
-from convertirGrey  import  imagen_gray
+#from convertirGrey  import  imagen_gray
+#from procesamientoImagen import operador_logaritmico
+from procesamientoImagen import histogram_equalization
 from flask import Flask ,render_template, request
 from werkzeug.utils import secure_filename
 
@@ -18,7 +20,10 @@ def uploader():
         filename = secure_filename(f.filename)
         full_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         f.save(full_filename)
-        imagen_resultado = imagen_gray(app.config['UPLOAD_FOLDER'], filename)
+        #PRUEBAS
+        imagen_resultado = histogram_equalization(app.config['UPLOAD_FOLDER'], filename)
+        #imagen_resultado = operador_logaritmico(app.config['UPLOAD_FOLDER'], filename)
+        #imagen_resultado = imagen_gray(app.config['UPLOAD_FOLDER'], filename)
 
         return  render_template('result.html', imagen=imagen_resultado)
 
