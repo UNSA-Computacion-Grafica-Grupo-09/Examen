@@ -28,12 +28,12 @@ def operador_raiz(folder, filename):
     imagen_resultado = cv2.imread(full_filename)
     imagen_gray = cv2.imread(full_filename, cv2.IMREAD_GRAYSCALE)
 
-    c = 255 / np.log10(1 + np.max(imagen_gray))
+    c = 50 / np.log10(1 + np.max(imagen_gray))
     alto, ancho = imagen_gray.shape
 
     for i in range(alto):
         for j in range(ancho):
-            raiz = c * (np.log10(imagen_gray[i][j]))
+            raiz = c * (np.sqrt(imagen_gray[i][j]))
             if (raiz < 0):  # Si el resultado del pixel es un valor menor que 0
                 imagen_resultado[i][j] = 0  # Se le asignara 0
             elif (raiz > 255):  # Si el resultado del pixel es un valor menor que 255
@@ -104,3 +104,117 @@ def histogram_equalization(folder, filename):
     cv2.imwrite(full_filename_new, img_result)
 
     return full_filename_new
+
+
+def constrast_streching(folder, filename):
+    full_filename = os.path.join(folder, filename)  # importante
+    imagen_original = cv2.imread(full_filename)  # importante
+    imagen_resultado = cv2.imread(full_filename)
+    # Detallamos los valores de las variables de Contrast stretching
+    a = 0  # límite inferior
+    b = 255  # límite superior
+    c = np.min(imagen_original)  # El menor valor de los pixeles
+    d = np.max(imagen_original)  # El mayor valor de los pixeles
+
+    alto, ancho, canales = imagen_original.shape
+
+    def point_operator(pixel_RGB):
+        return (pixel_RGB - c) * ((b - a) / (d - c) + a)
+
+    for x in range(alto):
+        for y in range(ancho):
+            imagen_resultado[x][y] = point_operator(imagen_original[x][y])
+
+    img_result = imagen_resultado  # importante
+    full_filename_new = os.path.join(folder, 'contrastre' + filename)  # importante
+    cv2.imwrite(full_filename_new, img_result)  # importante
+
+    return full_filename_new  # importante
+
+
+def constrast_streching_out(folder, filename):
+    full_filename = os.path.join(folder, filename)  # importante
+    res = cv2.imread(full_filename, cv2.IMREAD_GRAYSCALE)  # importante
+    imagen_original = cv2.imread(full_filename)
+    # Detallamos los valores de las variables de Contrast stretching
+    a = 0  # límite inferior
+    b = 255  # límite superior
+    # c = 69
+    # d = 149
+    c = np.min(imagen_original)  # El menor valor de los pixeles
+    d = np.max(imagen_original)  # El mayor valor de los pixeles
+
+    longi = d - c  # calculamos la longitud del rango
+    limitec = (longi * 5) / 100  # calculamos el limite a partir del porcentaje
+
+    newc = c - limitec  # El menor valor  en un limite de 5%
+
+    limited = (longi * 5) / 100  # calculamos el limite a partir del porcentaje
+    newd = d + limited
+
+    alto, ancho, canales = imagen_original.shape
+
+    for x in range(alto):
+        for y in range(ancho):
+            re = (res[x][y] - newc) * ((b - a) / (newd - newc) + a)
+            if (re < 0):
+                res[x][y] = 0
+            elif (re > 255):
+                res[x][y] = 255
+            else:
+                res[x][y] = re
+
+    img_result = res  # importante
+    full_filename_new = os.path.join(folder, 'constratreOutlier' + filename)  # importante
+    cv2.imwrite(full_filename_new, img_result)  # importante
+
+    return full_filename_new  # importante
+
+#Practica 5
+def power_raise(folder, filename, c):
+    full_filename = os.path.join(folder, filename)
+    imagen_resultado = cv2.imread(full_filename)
+    imagen_gray = cv2.imread(full_filename, cv2.IMREAD_GRAYSCALE)
+
+    r = 0.8
+    # c = 4
+    #c = 2.5
+    # #valores de c 1 1.2 0.5 0.8 3 cuando r = 1
+    alto, ancho = imagen_gray.shape
+
+    for x in range(alto):
+        for y in range(ancho):
+            resultado = (c * (np.power(imagen_gray[x][y], r)))
+            if resultado > 255:
+                imagen_resultado[x][y] = 255
+            elif resultado < 0:
+                imagen_resultado[x][y] = 0
+            else:
+                imagen_resultado[x][y] = (c * (np.power(imagen_gray[x][y], r)))
+
+    img_result = imagen_resultado  # importante
+    full_filename_new = os.path.join(folder, 'powerRaise' + filename)  # importante
+    cv2.imwrite(full_filename_new, img_result)  # importante
+
+    return full_filename_new  # importante
+
+#practica1
+def threholding(folder, filename):
+    full_filename = os.path.join(folder, filename)
+    imagen = cv2.imread(full_filename)
+    resultado = cv2.imread(full_filename)
+
+    height, width, chanels = imagen.shape
+    limi = 200  # limite inicial
+    limf = 230  # limite final
+
+    for i in range(height):
+        for j in range(width):
+            if (imagen[i][j][0] > limi or imagen[i][j][1] > limf or imagen[i][j][2] < limi):
+                resultado[i][j] = 0
+
+    img_result = resultado  # importante
+    full_filename_new = os.path.join(folder, 'thres' + filename)  # importante
+    cv2.imwrite(full_filename_new, img_result)  # importante
+
+    return full_filename_new  # importante
